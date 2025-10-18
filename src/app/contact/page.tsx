@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 const ContactPage = () => {
   return (
@@ -7,13 +7,15 @@ const ContactPage = () => {
         {/* container */}
         <div>
           {/* page header */}
-          <div>
-            <h1>Contact us</h1>
+          <div className="w-[100vw] h-[100svh] flex justify-center items-center p-[2rem]">
+            <h1 className="uppercase text-[#141414] text-[12rem] leading-none font-[family-name:var(--font-bebas-neue)]">
+              Contact us
+            </h1>
           </div>
         </div>
       </>
     </>
   );
-}
+};
 
-export default ContactPage
+export default ContactPage;

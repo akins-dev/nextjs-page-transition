@@ -10,11 +10,35 @@ const ProductsPage = () => {
       {/* container */}
       <div>
         {/* products */}
-        <div>
-          <Image src="/images/1.jpeg" alt="product" width={100} height={300} />
-          <Image src="/images/2.jpeg" alt="product" width={100} height={300} />
-          <Image src="/images/3.jpeg" alt="product" width={100} height={300} />
-          <Image src="/images/4.jpeg" alt="product" width={100} height={300} />
+        <div className="flex flex-col justify-center items-center py-[15rem] px-[2rem] gap-[2rem]">
+          <Image
+            src="/images/1.jpeg"
+            alt="product"
+            width={300}
+            height={300}
+            className="object-cover aspect-[5/7]"
+          />
+          <Image
+            src="/images/2.jpeg"
+            alt="product"
+            width={300}
+            height={300}
+            className="object-cover aspect-[5/7]"
+          />
+          <Image
+            src="/images/3.jpeg"
+            alt="product"
+            width={300}
+            height={300}
+            className="object-cover aspect-[5/7]"
+          />
+          <Image
+            src="/images/4.jpeg"
+            alt="product"
+            width={300}
+            height={300}
+            className="object-cover aspect-[5/7]"
+          />
         </div>
       </div>
     </>
