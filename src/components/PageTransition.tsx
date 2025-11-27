@@ -72,7 +72,7 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
       onComplete: () => router.push(url),
     });
 
-    // 1. Animate blocks in
+    // Animate blocks in
     tl.to(blockRef.current, {
       scaleX: 1,
       duration: 0.4,
@@ -80,10 +80,10 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
       ease: "power2.out",
       transformOrigin: "left",
     })
-      // 2. Show the logo container (opacity 1)
+      // Show the logo container (opacity 1)
       .set(logoOverlayRef.current, { opacity: 1 }, "-=0.2")
 
-      // 3. SCRAMBLE TEXT ANIMATION (Added to timeline!)
+      // SCRAMBLE TEXT ANIMATION (Added to timeline)
       .to(textRef.current, {
         duration: 0.8,
         scrambleText: {
@@ -94,10 +94,10 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
         ease: "none",
       })
 
-      // 4. Hold for a split second so user can read it
+      // Hold for a split second so user can read it
       .to({}, { duration: 0.3 })
 
-      // 5. Fade out logo container
+      // Fade out logo container
       .to(logoOverlayRef.current, {
         opacity: 0,
         duration: 0.25,
@@ -134,7 +134,6 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
         className="fixed top-0 left-0 w-[100vw] h-svh flex justify-center items-center pointer-events-none z-[9999] bg-transparent opacity-0"
       >
         <div className="flex justify-center items-center p-[20px]">
-          {/* Added text styling here so it is visible! */}
           <p
             ref={textRef}
             className="text-[#e3e4d8] text-4xl font-bold uppercase tracking-widest"
