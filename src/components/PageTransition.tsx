@@ -1,16 +1,21 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import Logo from "./Logo";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
+import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin"; 
+
+// Register outside the component to avoid strict mode issues
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrambleTextPlugin);
+}
 
 const PageTransition = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const logoOverlayRef = useRef<HTMLDivElement | null>(null);
-  const logoRef = useRef<SVGSVGElement | null>(null);
+  const textRef = useRef<HTMLParagraphElement>(null); // Typed correctly
   const blockRef = useRef<HTMLDivElement[]>([]);
   const isTransitioning = useRef<boolean>(false);
 
@@ -30,21 +35,10 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
 
     createBlocks();
 
+    // Reset blocks
     gsap.set(blockRef.current, { scaleX: 0, transformOrigin: "left" });
 
-    if (logoRef.current) {
-      const path = logoRef.current.querySelector("path");
-
-      if (path) {
-        const pathLength = path.getTotalLength();
-        gsap.set(path, {
-          strokeDasharray: pathLength,
-          strokeDashoffset: pathLength,
-          fill: "transparent",
-        });
-      }
-    }
-
+    // Reveal the page content
     revealPage();
 
     const handleRouteChange = (url: string) => {
@@ -53,25 +47,23 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
       coverPage(url);
     };
 
+    // Link Interception logic...
     const links = document.querySelectorAll<HTMLAnchorElement>('a[href^="/"]');
     const clickHandlers: EventListener[] = [];
-
     links.forEach((link) => {
       const onClick: EventListener = (e) => {
         e.preventDefault();
         const url = link.getAttribute("href");
-        if (url && url !== pathname) {
-          handleRouteChange(url);
-        }
+        if (url && url !== pathname) handleRouteChange(url);
       };
       clickHandlers.push(onClick);
       link.addEventListener("click", onClick);
     });
 
     return () => {
-      links.forEach((link, i) => {
-        link.removeEventListener("click", clickHandlers[i]);
-      });
+      links.forEach((link, i) =>
+        link.removeEventListener("click", clickHandlers[i])
+      );
     };
   }, [router, pathname]);
 
@@ -80,59 +72,44 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
       onComplete: () => router.push(url),
     });
 
-    const path =
-      logoRef.current && logoRef.current.querySelector
-        ? (logoRef.current.querySelector("path") as SVGPathElement | null)
-        : null;
-
+    // 1. Animate blocks in
     tl.to(blockRef.current, {
       scaleX: 1,
       duration: 0.4,
       stagger: 0.02,
       ease: "power2.out",
       transformOrigin: "left",
-    }).set(logoOverlayRef.current, { opacity: 1 }, "-=0.2");
+    })
+      // 2. Show the logo container (opacity 1)
+      .set(logoOverlayRef.current, { opacity: 1 }, "-=0.2")
 
-    if (path) {
-      const pathLength = path.getTotalLength();
-      tl.set(
-        path,
-        {
-          strokeDashoffset: pathLength,
-          fill: "transparent",
+      // 3. SCRAMBLE TEXT ANIMATION (Added to timeline!)
+      .to(textRef.current, {
+        duration: 0.8,
+        scrambleText: {
+          text: "AKINS.DEV", // The text to scramble TO
+          chars: "XO",
+          speed: 0.3,
         },
-        "-=0.25"
-      )
-        .to(
-          path,
-          {
-            strokeDashoffset: 0,
-            duration: 2,
-            ease: "power2.inOut",
-          },
-          "-=0.5"
-        )
-        .to(
-          path,
-          {
-            fill: "#e3e4d8",
-            duration: 1,
-            ease: "power2.out",
-          },
-          "-=0.5"
-        );
-    }
+        ease: "none",
+      })
 
-    tl.to(logoOverlayRef.current, {
-      opacity: 0,
-      duration: 0.25,
-      ease: "power2.out",
-    });
+      // 4. Hold for a split second so user can read it
+      .to({}, { duration: 0.3 })
+
+      // 5. Fade out logo container
+      .to(logoOverlayRef.current, {
+        opacity: 0,
+        duration: 0.25,
+        ease: "power2.out",
+      });
   };
 
   const revealPage = () => {
-    gsap.set(blockRef.current, { scaleX: 1, transformOrigin: "right" });
+    // Reset text to empty so it's ready for next time
+    if (textRef.current) textRef.current.innerText = "";
 
+    gsap.set(blockRef.current, { scaleX: 1, transformOrigin: "right" });
     gsap.to(blockRef.current, {
       scaleX: 0,
       duration: 0.4,
@@ -143,23 +120,25 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
         isTransitioning.current = false;
       },
     });
-  }
+  };
 
   return (
     <>
-      {/* transition overlay */}
       <div
         ref={overlayRef}
-        className="fixed top-0 left-0 w-[100vw] h-svh flex pointer-events-none z-2"
+        className="fixed top-0 left-0 w-[100vw] h-svh flex pointer-events-none z-[9998]"
       ></div>
-      {/* logo overlay */}
+
       <div
         ref={logoOverlayRef}
-        className="fixed top-0 left-0 w-[100vw] h-svh flex justify-center items-center pointer-events-none z-2 bg-[#222] opacity-0"
+        className="fixed top-0 left-0 w-[100vw] h-svh flex justify-center items-center pointer-events-none z-[9999] bg-transparent opacity-0"
       >
-        {/* logo container */}
-        <div className="w-[200px] h-[200px] flex justify-center items-center p-[20px] ">
-          <Logo ref={logoRef} />
+        <div className="flex justify-center items-center p-[20px]">
+          {/* Added text styling here so it is visible! */}
+          <p
+            ref={textRef}
+            className="text-[#e3e4d8] text-4xl font-bold uppercase tracking-widest"
+          ></p>
         </div>
       </div>
       {children}
