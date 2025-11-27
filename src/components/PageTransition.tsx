@@ -15,7 +15,7 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const logoOverlayRef = useRef<HTMLDivElement | null>(null);
-  const textRef = useRef<HTMLParagraphElement>(null); // Typed correctly
+  const textRef = useRef<HTMLParagraphElement>(null);
   const blockRef = useRef<HTMLDivElement[]>([]);
   const isTransitioning = useRef<boolean>(false);
 
